@@ -1,0 +1,19 @@
+# Entorno virtual (Librerías instaladas en tu PC)
+venv/
+env/
+ENV/
+
+# Base de Datos Local (Los datos de prueba de tu PC no van a la nube)
+*.sqlite3
+
+# Archivos temporales de Python (Basura de ejecución)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Configuraciones de VS Code
+.vscode/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

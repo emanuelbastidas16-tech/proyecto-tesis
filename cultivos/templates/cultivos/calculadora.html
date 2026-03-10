@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asistente Agrícola</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; background-color: #f4f9f4; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .paso { border-left: 4px solid #2ecc71; margin-bottom: 10px; padding-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🌱 Guía de Siembra Paso a Paso</h1>
+    <div class="card">
+        <form method="POST">
+            {% csrf_token %}
+            <label>¿Qué quieres sembrar?</label><br>
+            <select name="cultivo">
+                {% for c in cultivos %}
+                    <option value="{{ c.id }}">{{ c.get_nombre_display }}</option>
+                {% endfor %}
+            </select><br><br>
+            
+            <label>¿En qué estado vas a sembrar?</label><br>
+                <select name="estado" style="width: 100%; padding: 10px;">
+                    {% for codigo, nombre in lista_estados %}
+                        <option value="{{ codigo }}">{{ nombre }}</option>
+                    {% endfor %}
+                </select><br><br>
+
+            <label>¿Cómo es tu tipo de suelo?</label><br>
+            <select name="suelo" style="width: 100%; padding: 10px;">
+                <option value="optimo">Negro y suelto (Muy fértil)</option>
+                <option value="medio" selected>Normal (Tierra común)</option>
+                <option value="dificil">Duro o muy arcilloso</option>
+            </select>
+
+            <label>¿Cuántos metros cuadrados tienes?</label><br>
+            <input type="number" name="area" step="0.1" required><br><br>
+
+            <label>¿Cuándo vas a sembrar?</label><br>
+            <input type="date" name="fecha" required><br><br>
+
+            <button type="submit">Calcular mi cosecha</button>
+        </form>
+    </div>
+
+    {% if resultado %}
+    <hr>
+    <h2>Resultados para tu {{ resultado.cultivo }}</h2>
+    <p>📅 <strong>Fecha estimada de cosecha:</strong> {{ resultado.fecha_cosecha|date:"d M Y" }}</p>
+    <p>⚖️ <strong>Producción estimada:</strong> Entre {{ resultado.min }}kg y {{ resultado.max }}kg</p>
+    
+    <h3>Pasos a seguir:</h3>
+    {% for p in pasos %}
+        <div class="paso">
+            <h4>{{ p.orden }}. {{ p.titulo }}</h4>
+            <p>{{ p.instrucciones }}</p>
+        </div>
+    {% endfor %}
+    {% endif %}
+</body>
+</html>
