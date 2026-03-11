@@ -1,62 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Asistente Agrícola</title>
+    <meta charset="UTF-8">
+    <title>Asistente Agrícola Nacional</title>
     <style>
-        body { font-family: sans-serif; margin: 40px; background-color: #f4f9f4; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .paso { border-left: 4px solid #2ecc71; margin-bottom: 10px; padding-left: 10px; }
+        body { font-family: sans-serif; margin: 40px; background-color: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        select, input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        .resultado { background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #c8e6c9; }
+        .asesoria { background-color: #fff3e0; border-left: 5px solid #ff9800; padding: 15px; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <h1>🌱 Guía de Siembra Paso a Paso</h1>
-    <div class="card">
-        <form method="POST">
-            {% csrf_token %}
-            <label>¿Qué quieres sembrar?</label><br>
-            <select name="cultivo">
+
+<div class="container">
+    <h2>Asistente de Planificación Agrícola</h2>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Selecciona tu Cultivo:</label>
+            <select name="cultivo" required>
                 {% for c in cultivos %}
                     <option value="{{ c.id }}">{{ c.get_nombre_display }}</option>
                 {% endfor %}
-            </select><br><br>
-            
-            <label>¿En qué estado vas a sembrar?</label><br>
-                <select name="estado" style="width: 100%; padding: 10px;">
-                    {% for codigo, nombre in lista_estados %}
-                        <option value="{{ codigo }}">{{ nombre }}</option>
-                    {% endfor %}
-                </select><br><br>
-
-            <label>¿Cómo es tu tipo de suelo?</label><br>
-            <select name="suelo" style="width: 100%; padding: 10px;">
-                <option value="optimo">Negro y suelto (Muy fértil)</option>
-                <option value="medio" selected>Normal (Tierra común)</option>
-                <option value="dificil">Duro o muy arcilloso</option>
             </select>
+        </div>
 
-            <label>¿Cuántos metros cuadrados tienes?</label><br>
-            <input type="number" name="area" step="0.1" required><br><br>
+        <div class="form-group">
+            <label>Estado de Venezuela:</label>
+            <select name="estado" required>
+                {% for codigo, nombre in lista_estados %}
+                    <option value="{{ codigo }}">{{ nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-            <label>¿Cuándo vas a sembrar?</label><br>
-            <input type="date" name="fecha" required><br><br>
+        <div class="form-group">
+            <label>Tipo de Suelo:</label>
+            <select name="suelo" required>
+                <option value="optimo">Negro y Suelto (Fértil)</option>
+                <option value="medio" selected>Normal (Tierra común)</option>
+                <option value="dificil">Arcilloso o Muy Duro</option>
+            </select>
+        </div>
 
-            <button type="submit">Calcular mi cosecha</button>
-        </form>
-    </div>
+        <div class="form-group">
+            <label>Área a Sembrar (m²):</label>
+            <input type="number" name="area" step="0.1" required>
+        </div>
+
+        <div class="form-group">
+            <label>Fecha de Siembra:</label>
+            <input type="date" name="fecha" required>
+        </div>
+
+        <button type="submit">Calcular y Analizar</button>
+    </form>
 
     {% if resultado %}
-    <hr>
-    <h2>Resultados para tu {{ resultado.cultivo }}</h2>
-    <p>📅 <strong>Fecha estimada de cosecha:</strong> {{ resultado.fecha_cosecha|date:"d M Y" }}</p>
-    <p>⚖️ <strong>Producción estimada:</strong> Entre {{ resultado.min }}kg y {{ resultado.max }}kg</p>
-    
-    <h3>Pasos a seguir:</h3>
-    {% for p in pasos %}
-        <div class="paso">
-            <h4>{{ p.orden }}. {{ p.titulo }}</h4>
-            <p>{{ p.instrucciones }}</p>
+    <div class="resultado">
+        <h3>Resultados para {{ resultado.estado }}</h3>
+        <p><strong>Cosecha Estimada:</strong> Entre {{ resultado.min }} y {{ resultado.max }} kg</p>
+        <p><strong>Fecha aproximada de cosecha:</strong> {{ resultado.fecha_cosecha|date:"d/m/Y" }}</p>
+        
+        <div class="asesoria">
+            <h4>💡 Asesoría del Sistema Experto:</h4>
+            <p>{{ resultado.asesoria }}</p>
         </div>
-    {% endfor %}
+
+        {% if pasos %}
+        <h4>Pasos a seguir para el {{ resultado.cultivo }}:</h4>
+        <ul>
+            {% for paso in pasos %}
+                <li><strong>{{ paso.titulo }}:</strong> {{ paso.descripcion }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
     {% endif %}
+</div>
+
 </body>
 </html>
